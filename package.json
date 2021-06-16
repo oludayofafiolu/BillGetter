@@ -5,7 +5,9 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc src/index.ts && node src/index.js"
+    "build": "tsc",
+    "start": "node ./dist/src/index.js",
+    "build:start": "npm run build && npm run start"
   },
   "author": "Oludayo Fafiolu",
   "license": "ISC",
