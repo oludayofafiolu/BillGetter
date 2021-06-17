@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import express = require('express')
 import bodyParser = require('body-parser');
-import { GetFromProvider } from '../src/GetFromProvider/Provider'
+import { GetFromProvider } from './GetFromProvider/Provider'
 import { MongoDBD } from '../src/DataBase/MongoDB'
 import { ProviderRequest } from '../src/Models/ProviderRequest';
 import axiosHTTP from './common';
@@ -32,9 +32,16 @@ app.post('/', async (request: Request, response: Response) => {
     const providerRequest: ProviderRequest = request.body;
     console.log('Request :', JSON.stringify(providerRequest));
     if (providerRequest.provider && providerRequest.callbackUrl) {
-        const result = provider.getDataFromProviders(providerRequest.provider)
-        console.log(JSON.stringify(result))
-        response.status(200).send("👍");
+        const result: Promise<any> = provider.getDataFromProviders(providerRequest.provider)
+        result.then(data => {
+            for (let items of data) {
+                console.log(items);
+            }
+            response.status(200).send("👍");
+        }).catch(error => {
+            console.log("error")
+            response.status(400).send("👎 ");
+        })
     } else {
         console.error("Bad Request")
         response.status(400).send("👎 Invalid Request please use this format:" + JSON.stringify({

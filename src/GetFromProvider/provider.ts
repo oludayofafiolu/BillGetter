@@ -6,25 +6,36 @@ export class GetFromProvider {
     providerPort = 3000;
     [key: string]: any;
 
-    constructor() {}
+    constructor() { }
 
-    async getDataFromProviders(providers: [string]) {
-        const allBills: any = {}
+    getDataFromProviders(providers: [string]) {
+        let allBills: any[] = [];
+        var promises: Promise<any>[] = []
+
         providers.forEach((element: string) => {
-            const result = this.getData(element)
-            var tempArray: BillSchema[] = []
-            result.then((data) => {
-                data.forEach((payment: BillSchema) => {
-                    tempArray.push(payment)
-                });
-                console.log(element)
-                console.log(tempArray)
-        
-            }).catch((err) => {
-                console.error(err)
-            })
+            promises.push(this.getData(element))
         });
-        return allBills;
+
+        return new Promise<any>(async (resolve, reject) => {
+            Promise.allSettled(promises)
+            .then((results) => {
+                results.forEach(result => {
+                    if (result.status === 'fulfilled') {
+                        // console.log("result.value " + JSON.stringify(result.value));
+                        allBills.push(result.value)
+                    }
+                })
+                if (allBills.length != 0) {
+                    resolve(allBills)
+                } else {
+                    reject()
+                }
+                
+            }
+            ).catch(error => {
+                reject(error)
+            });
+        })
     }
 
     async getData(bill: string) {
@@ -32,7 +43,7 @@ export class GetFromProvider {
             try {
                 const responce = await axiosHTTP.get(`http://localhost:${this.providerPort}/providers/${bill}`)
                 if (responce.status == 200) {
-                    resolve(responce.data)
+                    resolve({ [bill]: responce.data })
                 } else {
                     reject(bill + " Providers are down received: " + responce.data)
                 }
