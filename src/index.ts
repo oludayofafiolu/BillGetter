@@ -38,7 +38,7 @@ app.post('/', async (request: Request, response: Response) => {
     } else {
         console.error("Bad Request")
         response.status(400).send("👎 Invalid Request please use this format:" + JSON.stringify({
-            "provider": "",
+            "provider": '[""]',
             "callbackUrl": ""
         }));
     }
@@ -53,6 +53,7 @@ async function sendToCallBackURL(callBackURL: string, data: any) {
             return false;
         }
     } catch (error) {
-        
+        console.error("couldn't send providers back");
+        return false;
     }
 }

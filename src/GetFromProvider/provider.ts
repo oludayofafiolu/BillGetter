@@ -19,6 +19,7 @@ export class GetFromProvider {
                 });
                 console.log(element)
                 console.log(tempArray)
+        
             }).catch((err) => {
                 console.error(err)
             })
