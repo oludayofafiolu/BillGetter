@@ -1,11 +1,7 @@
 import axiosHTTP from '../common';
-import { ProviderRequest } from '../Models/ProviderRequest';
-import { BillSchema } from '../Models/BillSchema';
 
 export class GetFromProvider {
     providerPort = 3000;
-    [key: string]: any;
-
     constructor() { }
 
     getDataFromProviders(providers: [string]) {
@@ -18,23 +14,21 @@ export class GetFromProvider {
 
         return new Promise<any>(async (resolve, reject) => {
             Promise.allSettled(promises)
-            .then((results) => {
-                results.forEach(result => {
-                    if (result.status === 'fulfilled') {
-                        // console.log("result.value " + JSON.stringify(result.value));
-                        allBills.push(result.value)
+                .then((results) => {
+                    results.forEach(result => {
+                        if (result.status === 'fulfilled') {
+                            allBills.push(result.value)
+                        }
+                    })
+                    if (allBills.length != 0) {
+                        resolve(allBills)
+                    } else {
+                        reject()
                     }
-                })
-                if (allBills.length != 0) {
-                    resolve(allBills)
-                } else {
-                    reject()
                 }
-                
-            }
-            ).catch(error => {
-                reject(error)
-            });
+                ).catch(error => {
+                    reject(error)
+                });
         })
     }
 

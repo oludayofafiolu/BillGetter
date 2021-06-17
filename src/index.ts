@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import express = require('express')
 import bodyParser = require('body-parser');
 import { GetFromProvider } from './GetFromProvider/Provider'
-import { MongoDBD } from '../src/DataBase/MongoDB'
 import { ProviderRequest } from '../src/Models/ProviderRequest';
 import axiosHTTP from './common';
 
@@ -13,10 +12,8 @@ app.use(express.raw());
 
 const port = 8000 || 9000;
 const provider = new GetFromProvider;
-const mongodb = new MongoDBD
 
 app.listen(port, () => {
-    mongodb.setupDb();
     return console.log(`server is listening on http://localhost:${port}`);
 });
 
@@ -25,7 +22,15 @@ app.on('error', function (e) {
 });
 
 app.get('/', (request: Request, response: Response) => {
-    response.send('Hello and welcome');
+    response.send('Hello and welcome').status(200);
+})
+
+app.post('/data', (request: Request, response: Response) => {
+    console.log("data received:");
+    request.body.forEach((element: any) => {
+        console.log(element)
+    });
+    response.send('Thanks for the data').status(200);
 });
 
 app.post('/', async (request: Request, response: Response) => {
@@ -33,14 +38,15 @@ app.post('/', async (request: Request, response: Response) => {
     console.log('Request :', JSON.stringify(providerRequest));
     if (providerRequest.provider && providerRequest.callbackUrl) {
         const result: Promise<any> = provider.getDataFromProviders(providerRequest.provider)
-        result.then(data => {
-            for (let items of data) {
-                console.log(items);
+        result.then(async data => {
+            const sentToCallBackURL = await sendToCallBackURL(providerRequest.callbackUrl, data)
+            if (sentToCallBackURL) {
+                response.status(200).send("👍 Data collected successfull and set to: "+ providerRequest.callbackUrl);
+            } else {
+                response.status(200).send("👍 Data collected successfull but, not send to " + providerRequest.callbackUrl + "👎");
             }
-            response.status(200).send("👍");
         }).catch(error => {
-            console.log("error")
-            response.status(400).send("👎 ");
+            response.status(400).send("👎 No Data from providers");
         })
     } else {
         console.error("Bad Request")
