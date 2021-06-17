@@ -6,6 +6,7 @@ import { ProviderRequest } from '../src/Models/ProviderRequest';
 import axiosHTTP from './common';
 
 const app = express();
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.raw());
@@ -70,3 +71,6 @@ async function sendToCallBackURL(callBackURL: string, data: any) {
         return false;
     }
 }
+
+
+module.exports = app;

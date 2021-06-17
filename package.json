@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "billergetter",
   "main": "src/index.ts",
+  "engines": {
+    "node": "15.15.1"
+  },
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest",
     "build": "tsc",
     "start": "node ./dist/src/index.js",
     "start:db": "docker-compose up -d",
