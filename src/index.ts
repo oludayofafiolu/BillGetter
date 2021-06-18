@@ -38,7 +38,7 @@ app.post('/data', (request: Request, response: Response) => {
 app.post('/', async (request: Request, response: Response) => {
     const providerRequest: ProviderRequest = request.body;
     console.log('Request :', JSON.stringify(providerRequest));
-    if (providerRequest.provider && providerRequest.callbackUrl) {
+    if (Array.isArray(providerRequest.provider) && (typeof(providerRequest.callbackUrl) =='string')) {
         const result = provider.getDataFromProviders(providerRequest.provider)
         let sentToCallBackURL;
         result.then(async data => {

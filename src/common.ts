@@ -3,13 +3,13 @@ import axios from 'axios';
 function axiosHTTP() {
   const instance = axios.create();
 
-  instance.interceptors.response.use(
+  instance.interceptors.request.use(
     (response) => {
       return response;
     },
     (error) => {
       if (error && error.response ) {
-        return error.response;
+        return  
       } else {
         return Promise.reject(error);
       }

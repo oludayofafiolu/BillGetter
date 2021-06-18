@@ -35,7 +35,7 @@ export class GetFromProvider {
     async getData(bill: string) {
         return new Promise<any>(async (resolve, reject) => {
             try {
-                const responce = await axiosHTTP.get(`http://localhost:${this.providerPort}/providers/${bill}`)
+                const responce = await axiosHTTP.get(`http://localhost:${this.providerPort}/providers/${bill}`,)
                 if (responce.status == 200) {
                     resolve({ [bill]: responce.data })
                 } else {
