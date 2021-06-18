@@ -1,4 +1,4 @@
 export interface ProviderRequest {
-    provider : [string];
+    provider : string[];
     callbackUrl: string;
 }

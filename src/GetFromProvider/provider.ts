@@ -4,13 +4,13 @@ export class GetFromProvider {
     providerPort = 3000;
     constructor() { }
 
-    getDataFromProviders(providers: [string]) {
+    getDataFromProviders(providers: string[]) {
         let allBills: any[] = [];
         var promises: Promise<any>[] = []
 
-        providers.forEach((element: string) => {
-            promises.push(this.getData(element))
-        });
+        for (let index = 0; index < providers.length; index++) {
+            promises.push(this.getData(providers[index]))
+        }
 
         return new Promise<any>(async (resolve, reject) => {
             Promise.allSettled(promises)

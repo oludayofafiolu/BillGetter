@@ -11,12 +11,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.raw());
 
-const port = 8000 || 9000;
+const port = 8000;
 const provider = new GetFromProvider;
 
 app.listen(port, () => {
     return console.log(`server is listening on http://localhost:${port}`);
-});
+})
 
 app.on('error', function (e) {
     console.log(e);
@@ -26,19 +26,19 @@ app.get('/', (request: Request, response: Response) => {
     response.send('Hello and welcome').status(200);
 })
 
-app.post('/data', (request: Request, response: Response) => {
-    console.log("data received:");
-    request.body.forEach((element: any) => {
-        console.log(element)
-    });
-    response.send('Thanks for the data').status(200);
-});
+// app.post('/data', (request: Request, response: Response) => {
+//     console.log("data received:");
+//     request.body.forEach((element: any) => {
+//         console.log(element)
+//     });
+//     response.send('Thanks for the data').status(200);
+// });
 
 app.post('/', async (request: Request, response: Response) => {
     const providerRequest: ProviderRequest = request.body;
     console.log('Request :', JSON.stringify(providerRequest));
     if (providerRequest.provider && providerRequest.callbackUrl) {
-        const result: Promise<any> = provider.getDataFromProviders(providerRequest.provider)
+        const result = provider.getDataFromProviders(providerRequest.provider)
         result.then(async data => {
             const sentToCallBackURL = await sendToCallBackURL(providerRequest.callbackUrl, data)
             if (sentToCallBackURL) {
@@ -50,7 +50,6 @@ app.post('/', async (request: Request, response: Response) => {
             response.status(400).send("👎 No Data from providers");
         })
     } else {
-        console.error("Bad Request")
         response.status(400).send("👎 Invalid Request please use this format:" + JSON.stringify({
             "provider": '[""]',
             "callbackUrl": ""

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const axiosHTTP = () => {
+function axiosHTTP() {
   const instance = axios.create();
 
   instance.interceptors.response.use(
