@@ -13,6 +13,7 @@ app.use(express.raw());
 
 const port = 8000;
 const provider = new GetFromProvider;
+var history: any[] = [];
 
 app.listen(port, () => {
     return console.log(`server is listening on http://localhost:${port}`);
@@ -26,28 +27,39 @@ app.get('/', (request: Request, response: Response) => {
     response.send('Hello and welcome').status(200);
 })
 
-// app.post('/data', (request: Request, response: Response) => {
-//     console.log("data received:");
-//     request.body.forEach((element: any) => {
-//         console.log(element)
-//     });
-//     response.send('Thanks for the data').status(200);
-// });
+app.post('/data', (request: Request, response: Response) => {
+    console.log("data received:");
+    request.body.forEach((element: any) => {
+        console.log(element)
+    });
+    response.send('Thanks for the data').status(200);
+});
 
 app.post('/', async (request: Request, response: Response) => {
     const providerRequest: ProviderRequest = request.body;
     console.log('Request :', JSON.stringify(providerRequest));
     if (providerRequest.provider && providerRequest.callbackUrl) {
         const result = provider.getDataFromProviders(providerRequest.provider)
+        let sentToCallBackURL;
         result.then(async data => {
-            const sentToCallBackURL = await sendToCallBackURL(providerRequest.callbackUrl, data)
+            history.push(data)
+            sentToCallBackURL = await sendToCallBackURL(providerRequest.callbackUrl, data)
             if (sentToCallBackURL) {
-                response.status(200).send("👍 Data collected successfull and set to: "+ providerRequest.callbackUrl);
+                response.status(200).send("👍 Data collected successfull and set to: " + providerRequest.callbackUrl);
             } else {
                 response.status(200).send("👍 Data collected successfull but, not send to " + providerRequest.callbackUrl + "👎");
             }
-        }).catch(error => {
-            response.status(400).send("👎 No Data from providers");
+        }).catch(async error => {
+            if (history[history.length - 1]) {
+                sentToCallBackURL = await sendToCallBackURL(providerRequest.callbackUrl, history[history.length - 1])
+                if (sentToCallBackURL) {
+                    response.status(200).send("👍 Old data successfull and set to: " + providerRequest.callbackUrl);
+                } else {
+                    response.status(200).send("👍 Data collected successfull but, not send to " + providerRequest.callbackUrl + "👎");
+                }
+            } else {
+                response.status(400).send("👎 No Data from providers");
+            }
         })
     } else {
         response.status(400).send("👎 Invalid Request please use this format:" + JSON.stringify({
@@ -57,7 +69,7 @@ app.post('/', async (request: Request, response: Response) => {
     }
 })
 
-async function sendToCallBackURL(callBackURL: string, data: any) {
+export async function sendToCallBackURL(callBackURL: string, data: any) {
     try {
         const responce = await axiosHTTP.post(callBackURL, data);
         if (responce.status == 200) {

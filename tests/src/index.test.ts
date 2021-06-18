@@ -1,14 +1,17 @@
 const request = require("supertest");
-const app  = require("../../src/index");
+const app = require("../../src/index");
+const sendToCallBackURL = require("../../src/index")
 import mockAxios from 'axios';
 import { anything, instance, mock, when } from "ts-mockito";
 import { GetFromProvider } from "../../src/GetFromProvider/Provider"
 import { ProviderRequest } from '../../src/Models/ProviderRequest';
+import axiosHTTP from '../../src/common';
 
 
 describe("Test Express", () => {
 
   const mockedGetFromProvider: GetFromProvider = mock(GetFromProvider);
+  const mockAxios = mock(axiosHTTP);
   const providerRequest: ProviderRequest = {
     provider: ["gas", "internet"],
     callbackUrl: "http://localhost:8000/data"
@@ -43,6 +46,7 @@ describe("Test Express", () => {
   it("test post and return success data", async () => {
     const response = await request(app).post('/').send(providerRequest);
     when(mockedGetFromProvider.getDataFromProviders(providerRequest.provider)).thenResolve(returnedData[0])
+    // when(mockAxios.get(anything())).thenResolve(anything())
     expect(response.statusCode).toBe(200)
   })
 
